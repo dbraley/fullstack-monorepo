@@ -1,0 +1,43 @@
+version: '3'
+services:
+  pkg_test:
+    build:
+      context: ./golang
+      dockerfile: ./Dockerfile.test
+      args:
+        project: ./pkg/...
+    volumes:
+      - testing_vol:/usr/src/pkg/
+    networks:
+      - monorepo_net
+  calypso_test:
+    build:
+      context: ./golang
+      dockerfile: ./Dockerfile.test
+      args:
+        project: ./cmd/calypso/...
+    depends_on:
+      - pkg_test
+    volumes:
+      - testing_vol:/usr/src/calypso/
+    networks:
+      - monorepo_net
+  echo_test:
+    build:
+      context: ./golang
+      dockerfile: ./Dockerfile.test
+      args:
+        project: ./cmd/echo/...
+    depends_on:
+      - pkg_test
+    volumes:
+      - testing_vol:/usr/src/echo/
+    networks:
+      - monorepo_net
+
+volumes:
+  testing_vol:
+
+networks:
+  monorepo_net:
+    driver: bridge
